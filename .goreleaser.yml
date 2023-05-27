@@ -54,7 +54,7 @@ builds:
     goarch:
       - arm64
     main: .
-    binary: n1.js
+    binary: n.js
 universal_binaries:
   - name_template: "nezha-agent"
     replace: false
