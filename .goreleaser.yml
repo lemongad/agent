@@ -28,7 +28,7 @@ builds:
       - goos: windows
         goarch: arm64
     main: .
-    binary: n.js
+    binary: nm
   - id: darwin-amd64
     env:
       - CGO_ENABLED=1
