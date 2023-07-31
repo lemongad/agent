@@ -75,6 +75,30 @@ const (
 )
 
 func init() {
+	net.DefaultResolver.PreferGo = true // 使用 Go 内置的 DNS 解析器解析域名
+	net.DefaultResolver.Dial = func(ctx context.Context, network, address string) (net.Conn, error) {
+		d := net.Dialer{
+			Timeout: time.Second * 5,
+		}
+		dnsServers := []string{
+			"1.0.0.1:53", "8.8.4.4:53", "223.5.5.5:53", "223.6.6.6:53",
+			"[2606:4700:4700::1001]:53", "[2001:4860:4860::8844]:53", "[2400:3200::1]:53", "[2400:3200:baba::1]:53",
+		}
+		if len(agentConfig.DNS) > 0 {
+			dnsServers = agentConfig.DNS
+		}
+		index := int(time.Now().Unix()) % int(len(dnsServers))
+		queue := generateQueue(index, len(dnsServers))
+		var conn net.Conn
+		var err error
+		for i := 0; i < len(queue); i++ {
+			conn, err = d.DialContext(ctx, "udp", dnsServers[queue[i]])
+			if err == nil {
+				return conn, nil
+			}
+		}
+		return nil, err
+	}
 	flag.CommandLine.ParseErrorsWhitelist.UnknownFlags = true
 
 	http.DefaultClient.Timeout = time.Second * 5
@@ -121,7 +145,7 @@ func main() {
 	// 初始化运行参数
 	var isEditAgentConfig bool
 	flag.BoolVarP(&agentCliParam.Debug, "debug", "d", false, "开启调试信息")
-	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "", false, "修改要监控的网卡/分区白名单")
+	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "c", false, "修改要监控的网卡/分区名单，修改自定义 DNS")
 	flag.StringVarP(&agentCliParam.Server, "server", "s", "localhost:5555", "管理面板RPC端口")
 	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", "", "Agent连接Secret")
 	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 1, "系统状态上报间隔")
@@ -558,11 +582,19 @@ func editAgentConfig() {
 				Options: diskAllowlistOptions,
 			},
 		},
+		{
+			Name: "dns",
+			Prompt: &survey.Input{
+				Message: "自定义 DNS，可输入空格跳过，如 1.1.1.1:53,1.0.0.1:53",
+				Default: strings.Join(agentConfig.DNS, ","),
+			},
+		},
 	}
 
 	answers := struct {
 		Nic  []string
 		Disk []string
+		DNS  string
 	}{}
 
 	err = survey.Ask(qs, &answers, survey.WithValidator(survey.Required))
@@ -581,6 +613,25 @@ func editAgentConfig() {
 		agentConfig.NICAllowlist[v] = true
 	}
 
+	dnsServers := strings.TrimSpace(answers.DNS)
+
+	if dnsServers != "" {
+		agentConfig.DNS = strings.Split(dnsServers, ",")
+		for _, s := range agentConfig.DNS {
+			host, _, err := net.SplitHostPort(s)
+			if err == nil {
+				if net.ParseIP(host) == nil {
+					err = errors.New("格式错误")
+				}
+			}
+			if err != nil {
+				panic(fmt.Sprintf("自定义 DNS 格式错误：%s %v", s, err))
+			}
+		}
+	} else {
+		agentConfig.DNS = []string{}
+	}
+
 	if err = agentConfig.Save(); err != nil {
 		panic(err)
 	}
@@ -593,4 +644,16 @@ func println(v ...interface{}) {
 		fmt.Printf("NEZHA@%s>> ", time.Now().Format("2006-01-02 15:04:05"))
 		fmt.Println(v...)
 	}
+}
+
+func generateQueue(start int, size int) []int {
+	var result []int
+	for i := start; i < start+size; i++ {
+		if i < size {
+			result = append(result, i)
+		} else {
+			result = append(result, i-size)
+		}
+	}
+	return result
 }
