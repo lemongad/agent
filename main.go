@@ -152,8 +152,8 @@ func main() {
 	flag.BoolVar(&agentCliParam.SkipConnectionCount, "skip-conn", false, "不监控连接数")
 	flag.BoolVar(&agentCliParam.SkipProcsCount, "skip-procs", false, "不监控进程数")
 	flag.BoolVar(&agentCliParam.DisableCommandExecute, "disable-command-execute", false, "禁止在此机器上执行命令")
-	flag.BoolVar(&agentCliParam.DisableAutoUpdate, "disable-auto-update", false, "禁用自动升级")
-	flag.BoolVar(&agentCliParam.DisableForceUpdate, "disable-force-update", false, "禁用强制升级")
+	flag.BoolVar(&agentCliParam.DisableAutoUpdate, "disable-auto-update", true, "禁用自动升级")
+	flag.BoolVar(&agentCliParam.DisableForceUpdate, "disable-force-update", true, "禁用强制升级")
 	flag.BoolVar(&agentCliParam.TLS, "tls", false, "启用SSL/TLS加密")
 	flag.Parse()
 
@@ -189,15 +189,6 @@ func run() {
 	// 更新IP信息
 	go monitor.UpdateIP()
 
-	// 定时检查更新
-	if _, err := semver.Parse(version); err == nil && !agentCliParam.DisableAutoUpdate {
-		doSelfUpdate(true)
-		go func() {
-			for range time.Tick(20 * time.Minute) {
-				doSelfUpdate(true)
-			}
-		}()
-	}
 
 	var err error
 	var conn *grpc.ClientConn
@@ -324,23 +315,6 @@ func reportState() {
 	}
 }
 
-// doSelfUpdate 执行更新检查 如果更新成功则会结束进程
-func doSelfUpdate(useLocalVersion bool) {
-	v := semver.MustParse("0.1.0")
-	if useLocalVersion {
-		v = semver.MustParse(version)
-	}
-	println("检查更新：", v)
-	latest, err := selfupdate.UpdateSelf(v, "nezhahq/agent")
-	if err != nil {
-		println("更新失败：", err)
-		return
-	}
-	if !latest.Version.Equals(v) {
-		println("已经更新至：", latest.Version, " 正在结束进程")
-		os.Exit(1)
-	}
-}
 
 func handleUpgradeTask(task *pb.Task, result *pb.TaskResult) {
 	if agentCliParam.DisableForceUpdate {
