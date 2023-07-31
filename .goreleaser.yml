@@ -28,7 +28,7 @@ builds:
       - goos: windows
         goarch: arm64
     main: .
-    binary: agent{{ if .Arch }}_{{ .Arch }}{{ end }}{{ if .Os }}_{{ .Os }}{{ end }}
+    binary: agent
   - id: darwin-amd64
     env:
       - CGO_ENABLED=1
@@ -41,7 +41,7 @@ builds:
     goarch:
       - amd64
     main: .
-    binary: agent{{ if .Arch }}_{{ .Arch }}{{ end }}{{ if .Os }}_{{ .Os }}{{ end }}
+    binary: agent
   - id: darwin-arm64
     env:
       - CGO_ENABLED=1
@@ -54,7 +54,7 @@ builds:
     goarch:
       - arm64
     main: .
-    binary: agent{{ if .Arch }}_{{ .Arch }}{{ end }}{{ if .Os }}_{{ .Os }}{{ end }}
+    binary: agent
 universal_binaries:
   - name_template: "agent"
     replace: false
@@ -62,12 +62,11 @@ checksum:
   name_template: "checksums.txt"
 snapshot:
   name_template: "agent"
-archives:     
-  - name_template: "agent{{ if .Arch }}_{{ .Arch }}{{ end }}{{ if .Os }}_{{ .Os }}{{ end }}"     
-    format: ""     
-    files:      
-      - "agent{{ if .Arch }}_{{ .Arch }}{{ end }}{{ if .Os }}_{{ .Os }}{{ end }}"
-     
+archives:
+  - name_template: "agent_{{ .Os }}_{{ .Arch }}"
+    format: zip
+    files:
+      - none*
 changelog:
   sort: asc
   filters:
