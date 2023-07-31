@@ -4,7 +4,7 @@ builds:
       - CGO_ENABLED=0
       - GOFLAGS=-trimpath
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
+      - -s -w -X main.version={{.Version}} -X main.arch={{.GOARCH}}
     goos:
       - linux
       - windows
@@ -26,7 +26,7 @@ builds:
       - goos: windows
         goarch: arm64
     main: .
-    binary: agent_{{.Os}}_{{.Arch}}
+    binary: agent_{{.GOOS}}_{{.GOARCH}}
   - id: darwin-amd64
     env:
       - CGO_ENABLED=1
@@ -34,13 +34,13 @@ builds:
       - CXX=o64-clang++
       - GOFLAGS=-trimpath
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
+      - -s -w -X main.version={{.Version}} -X main.arch={{.GOARCH}}
     goos:
       - darwin
     goarch:
       - amd64
     main: .
-    binary: agent_{{.Os}}_{{.Arch}}
+    binary: agent_{{.GOOS}}_{{.GOARCH}}
   - id: darwin-arm64
     env:
       - CGO_ENABLED=1
@@ -48,15 +48,15 @@ builds:
       - CXX=oa64-clang++
       - GOFLAGS=-trimpath
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
+      - -s -w -X main.version={{.Version}} -X main.arch={{.GOARCH}}
     goos:
       - darwin
     goarch:
       - arm64
     main: .
-    binary: agent_{{.Os}}_{{.Arch}}
+    binary: agent_{{.GOOS}}_{{.GOARCH}}
 universal_binaries:
-  - name_template: "agent_{{.Os}}_{{.Arch}}"
+  - name_template: "agent_{{.GOOS}}_{{.GOARCH}}"
     replace: false
 checksum:
   name_template: "checksums.txt"
