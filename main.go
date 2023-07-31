@@ -17,10 +17,8 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	bpc "github.com/DaRealFreak/cloudflare-bp-go"
-	"github.com/blang/semver"
 	"github.com/go-ping/ping"
 	"github.com/gorilla/websocket"
-	"github.com/nezhahq/go-github-selfupdate/selfupdate"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
 	psnet "github.com/shirou/gopsutil/v3/net"
@@ -28,7 +26,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-
 	"github.com/nezhahq/agent/model"
 	"github.com/nezhahq/agent/pkg/monitor"
 	"github.com/nezhahq/agent/pkg/processgroup"
@@ -315,13 +312,6 @@ func reportState() {
 	}
 }
 
-
-func handleUpgradeTask(task *pb.Task, result *pb.TaskResult) {
-	if agentCliParam.DisableForceUpdate {
-		return
-	}
-	doSelfUpdate(false)
-}
 
 func handleTcpPingTask(task *pb.Task, result *pb.TaskResult) {
 	start := time.Now()
