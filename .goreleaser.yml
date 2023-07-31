@@ -2,6 +2,7 @@ builds:
   - id: universal
     env:
       - CGO_ENABLED=0
+      - GOFLAGS=-trimpath
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
     goos:
@@ -25,12 +26,13 @@ builds:
       - goos: windows
         goarch: arm64
     main: .
-    binary: agent
+    binary: agent_{{.Os}}_{{.Arch}}
   - id: darwin-amd64
     env:
       - CGO_ENABLED=1
       - CC=o64-clang
       - CXX=o64-clang++
+      - GOFLAGS=-trimpath
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
     goos:
@@ -38,12 +40,13 @@ builds:
     goarch:
       - amd64
     main: .
-    binary: agent
+    binary: agent_{{.Os}}_{{.Arch}}
   - id: darwin-arm64
     env:
       - CGO_ENABLED=1
       - CC=oa64-clang
       - CXX=oa64-clang++
+      - GOFLAGS=-trimpath
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
     goos:
@@ -51,19 +54,14 @@ builds:
     goarch:
       - arm64
     main: .
-    binary: agent
+    binary: agent_{{.Os}}_{{.Arch}}
 universal_binaries:
-  - name_template: "agent"
+  - name_template: "agent_{{.Os}}_{{.Arch}}"
     replace: false
 checksum:
   name_template: "checksums.txt"
 snapshot:
   name_template: "agent"
-archives:
-  - name_template: "agent_{{ .Os }}_{{ .Arch }}"
-    format: none
-    files:
-      - none*
 changelog:
   sort: asc
   filters:
