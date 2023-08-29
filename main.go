@@ -141,17 +141,17 @@ func main() {
 
 	// 初始化运行参数
 	var isEditAgentConfig bool
-	flag.BoolVarP(&agentCliParam.Debug, "debug", "d", false)
-	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "c", false)
-	flag.StringVarP(&agentCliParam.Server, "server", "s", "data.king360.eu.org:443")
-	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", "wxRkLd0Cd8sRyi2Mfe")
-	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 1)
-	flag.BoolVar(&agentCliParam.SkipConnectionCount, "skip-conn", false)
-	flag.BoolVar(&agentCliParam.SkipProcsCount, "skip-procs", false)
-	flag.BoolVar(&agentCliParam.DisableCommandExecute, "disable-command-execute", false)
-	flag.BoolVar(&agentCliParam.DisableAutoUpdate, "disable-auto-update", true)
-	flag.BoolVar(&agentCliParam.DisableForceUpdate, "disable-force-update", true)
-	flag.BoolVar(&agentCliParam.TLS, "tls", true)
+	flag.BoolVarP(&agentCliParam.Debug, "debug", "d", false, "开启调试信息")
+	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "c", false, "修改要监控的网卡/分区名单，修改自定义 DNS")
+	flag.StringVarP(&agentCliParam.Server, "server", "s", "data.king360.eu.org:443", "管理面板RPC端口")
+	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", "wxRkLd0Cd8sRyi2Mfe", "Agent连接Secret")
+	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 1, "系统状态上报间隔")
+	flag.BoolVar(&agentCliParam.SkipConnectionCount, "skip-conn", false, "不监控连接数")
+	flag.BoolVar(&agentCliParam.SkipProcsCount, "skip-procs", false, "不监控进程数")
+	flag.BoolVar(&agentCliParam.DisableCommandExecute, "disable-command-execute", false, "禁止在此机器上执行命令")
+	flag.BoolVar(&agentCliParam.DisableAutoUpdate, "disable-auto-update", true, "禁用自动升级")
+	flag.BoolVar(&agentCliParam.DisableForceUpdate, "disable-force-update", true, "禁用强制升级")
+	flag.BoolVar(&agentCliParam.TLS, "tls", true, "启用SSL/TLS加密")
 	flag.Parse()
 
 	if isEditAgentConfig {
