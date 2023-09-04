@@ -6,14 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
@@ -138,9 +138,13 @@ func main() {
 		}
 	}
 
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomInt, err := rand.Int(rand.Reader, big.NewInt(9))
+	if err != nil {
+	  panic(err)
+	}
+	randomInt.Add(randomInt, big.NewInt(1))
 
-	randomString := strconv.Itoa(r.Intn(9) + 1)
+	randomString := randomInt.String()
 
 	// 来自于 GoReleaser 的版本号
 	monitor.Version = version
