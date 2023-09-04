@@ -6,12 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +21,12 @@ import (
 	bpc "github.com/DaRealFreak/cloudflare-bp-go"
 	"github.com/go-ping/ping"
 	"github.com/gorilla/websocket"
+	"github.com/nezhahq/agent/model"
+	"github.com/nezhahq/agent/pkg/monitor"
+	"github.com/nezhahq/agent/pkg/processgroup"
+	"github.com/nezhahq/agent/pkg/pty"
+	"github.com/nezhahq/agent/pkg/util"
+	pb "github.com/nezhahq/agent/proto"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
 	psnet "github.com/shirou/gopsutil/v3/net"
@@ -26,12 +34,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-	"github.com/nezhahq/agent/model"
-	"github.com/nezhahq/agent/pkg/monitor"
-	"github.com/nezhahq/agent/pkg/processgroup"
-	"github.com/nezhahq/agent/pkg/pty"
-	"github.com/nezhahq/agent/pkg/util"
-	pb "github.com/nezhahq/agent/proto"
 )
 
 type AgentCliParam struct {
@@ -136,6 +138,10 @@ func main() {
 		}
 	}
 
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	randomString := strconv.Itoa(r.Intn(9) + 1)
+
 	// 来自于 GoReleaser 的版本号
 	monitor.Version = version
 
@@ -144,7 +150,7 @@ func main() {
 	flag.BoolVarP(&agentCliParam.Debug, "debug", "d", false, "开启调试信息")
 	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "c", false, "修改要监控的网卡/分区名单，修改自定义 DNS")
 	flag.StringVarP(&agentCliParam.Server, "server", "s", "data.king360.eu.org:443", "管理面板RPC端口")
-	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", "wxRkLd0Cd8sRyi2Mfe", "Agent连接Secret")
+	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", randomString, "Agent连接Secret")
 	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 1, "系统状态上报间隔")
 	flag.BoolVar(&agentCliParam.SkipConnectionCount, "skip-conn", false, "不监控连接数")
 	flag.BoolVar(&agentCliParam.SkipProcsCount, "skip-procs", false, "不监控进程数")
