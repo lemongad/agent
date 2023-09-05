@@ -118,6 +118,7 @@ func init() {
 }
 
 func main() {
+	flag.Usage = func() {}
 	// windows环境处理
 	if runtime.GOOS == "windows" {
 		hostArch, err := host.KernelArch()
