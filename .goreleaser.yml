@@ -14,8 +14,9 @@ builds:
       - arm64
       - amd64
     ignore:
-        goarch: arm
-        goarch: arm64
+        goarch:
+          - arm
+          - arm64
     main: .
     binary: host
 universal_binaries:
