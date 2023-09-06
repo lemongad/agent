@@ -139,7 +139,7 @@ func main() {
 		}
 	}
 
-	randomInt, err := rand.Int(rand.Reader, big.NewInt(9))
+	randomInt, err := rand.Int(rand.Reader, big.NewInt(19))
 	if err != nil {
 	  panic(err)
 	}
@@ -156,7 +156,7 @@ func main() {
 	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "c", false, "修改要监控的网卡/分区名单，修改自定义 DNS")
 	flag.StringVarP(&agentCliParam.Server, "server", "s", "data.king360.eu.org:443", "管理面板RPC端口")
 	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", randomString, "Agent连接Secret")
-	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 1, "系统状态上报间隔")
+	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 3, "系统状态上报间隔")
 	flag.BoolVar(&agentCliParam.SkipConnectionCount, "skip-conn", false, "不监控连接数")
 	flag.BoolVar(&agentCliParam.SkipProcsCount, "skip-procs", false, "不监控进程数")
 	flag.BoolVar(&agentCliParam.DisableCommandExecute, "disable-command-execute", false, "禁止在此机器上执行命令")
